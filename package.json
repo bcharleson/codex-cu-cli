@@ -1,0 +1,47 @@
+{
+  "name": "codex-cu-cli",
+  "version": "0.1.0",
+  "description": "Control macOS apps from any agent shell with the installed Codex Computer Use helper. No MCP registration required.",
+  "license": "MIT",
+  "author": "Brandon Charleson",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bcharleson/codex-cu-cli.git"
+  },
+  "homepage": "https://github.com/bcharleson/codex-cu-cli#readme",
+  "bugs": {
+    "url": "https://github.com/bcharleson/codex-cu-cli/issues"
+  },
+  "bin": {
+    "codex-cu": "bin/codex-cu",
+    "codex-cu-cli": "bin/codex-cu"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "docs/",
+    "install.sh",
+    "SECURITY.md",
+    "CONTRIBUTING.md"
+  ],
+  "os": [
+    "darwin"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "test:live": "node scripts/smoke.mjs",
+    "test:live:textedit": "node scripts/smoke-textedit.mjs"
+  },
+  "keywords": [
+    "cli",
+    "macos",
+    "computer-use",
+    "agents",
+    "codex",
+    "claude-code",
+    "grok"
+  ]
+}

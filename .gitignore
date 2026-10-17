@@ -1,0 +1,12 @@
+.DS_Store
+node_modules/
+*.log
+*.tgz
+.env
+.env.*
+!.env.example
+artifacts/
+.codex/
+.claude/
+codex-cu-*.png
+codex-cu-*.jpg

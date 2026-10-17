@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# codex-cu: control macOS apps from a shell using the installed Codex helper.
+#
+#   codex-cu           show command help
+#   codex-cu doctor    check the install and connection
+#   codex-cu demo      work out 12 × 12 in Calculator in the background
+set -euo pipefail
+
+# Resolve npm's symlink without GNU readlink -f (not present on older macOS).
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -L "$SOURCE" ]]; do
+  LINK_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ "$SOURCE" = /* ]] || SOURCE="$LINK_DIR/$SOURCE"
+done
+ROOT="$(cd -P "$(dirname "$SOURCE")/.." && pwd)"
+
+# Prefer the Node runtime bundled with the ChatGPT app; it is what the server
+# itself runs on, so no separate Node install is required.
+BUNDLED_NODE="/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
+if [[ -n "${CODEX_CU_NODE:-}" ]]; then
+  NODE="$CODEX_CU_NODE"
+elif [[ -x "$BUNDLED_NODE" ]]; then
+  NODE="$BUNDLED_NODE"
+elif command -v node >/dev/null 2>&1; then
+  NODE="$(command -v node)"
+else
+  echo "codex-cu: no Node runtime found (is the ChatGPT desktop app installed?)" >&2
+  exit 1
+fi
+
+exec "$NODE" "$ROOT/lib/main.mjs" "$@"

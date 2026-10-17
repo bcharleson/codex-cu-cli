@@ -1,0 +1,23 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { execFileSync, spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const installer = fileURLToPath(new URL('../install.sh', import.meta.url));
+test('checkout installer supports spaces, idempotency, uninstall, and refuses collisions', t => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'cu-install-'));
+  t.after(() => fs.rmSync(temp, { recursive: true, force: true }));
+  const dir = path.join(temp, 'with spaces');
+  const run = extra => execFileSync(installer, ['--bin-dir', dir, ...extra], { encoding: 'utf8' });
+  run(['--dry-run']); assert.equal(fs.existsSync(dir), false);
+  run([]); run([]);
+  assert.equal(fs.lstatSync(path.join(dir, 'codex-cu')).isSymbolicLink(), true);
+  assert.match(execFileSync(path.join(dir, 'codex-cu'), ['--version'], { encoding: 'utf8' }), /0\.1\.0/);
+  run(['--uninstall']); run(['--uninstall']);
+  fs.writeFileSync(path.join(dir, 'codex-cu'), 'owned by someone else');
+  assert.equal(spawnSync(installer, ['--bin-dir', dir]).status, 1);
+  assert.equal(spawnSync(installer, ['--bin-dir', dir, '--uninstall']).status, 1);
+  assert.equal(fs.readFileSync(path.join(dir, 'codex-cu'), 'utf8'), 'owned by someone else');
+});

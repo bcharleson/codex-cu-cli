@@ -1,0 +1,22 @@
+name: Test
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        node: [18, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test
+      - name: Install the packed artifact
+        run: |
+          npm pack --pack-destination "$RUNNER_TEMP"
+          npm install -g --prefix "$RUNNER_TEMP/cu-package" "$RUNNER_TEMP/codex-cu-cli-0.1.0.tgz"
+          "$RUNNER_TEMP/cu-package/bin/codex-cu" --version
+          "$RUNNER_TEMP/cu-package/bin/codex-cu" --help
